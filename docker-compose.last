@@ -1,0 +1,48 @@
+services:
+  fcra:
+    build: .
+    ports:
+      - "8080:8180"
+    container_name: fcra-app
+  ollama:
+    image: shiny_dev-ollama
+#   image:  ollama/ollama:latest
+#   build:
+#     context: .
+#     dockerfile: Dockerfile.ollama 
+
+#   image:  ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
+#   command: >
+#     pull codellama:7b
+#     ollama pull codellama:7b
+    ports:
+      - "11434:11434"
+#     - "53:53"
+    network_mode: bridge 
+    dns:
+      - 10.95.72.190
+      - 10.95.72.191
+    container_name: ollama
+    environment:
+#     - OLLAMA_MODELS=/root/.ollama/models
+     - OLLAMA_MODELS=/usr/share/ollama/.ollama/models
+    volumes:
+      - /root/.ollama
+#     - /root/.ollama/models
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+    container_name: open-webui
+    ports:
+      - "8190:8080"
+#     - "3000:8080"
+#     - ${OPEN_WEBUI_PORT-3000}:8190
+    network_mode: bridge 
+    depends_on:
+      - ollama
+    volumes:
+      - open-webui:/app/backend/data
+
+volumes:
+  ollama: {}
+  open-webui: {}

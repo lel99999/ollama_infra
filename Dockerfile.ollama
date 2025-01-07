@@ -1,0 +1,14 @@
+FROM ollama/ollama:latest
+#FROM ollama_models
+#COPY my-ca.pem /usr/local/share/ca-certificates/my-ca.crt
+#RUN update-ca-certificates
+#RUN apt-get -y update --allow-insecure-repositories && apt-get install -y vim curl
+RUN apt-get -y update && apt-get install -y vim iputils-ping net-tools dnsutils
+
+COPY ./run_ollama.sh /tmp/run_ollama.sh
+
+WORKDIR /tmp
+
+RUN chmod +x run_ollama.sh && ./run_ollama.sh
+
+EXPOSE 11434

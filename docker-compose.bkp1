@@ -1,0 +1,36 @@
+services:
+  fcra:
+    build: .
+    ports:
+      - "8080:8180"
+    container_name: fcra-app
+  ollama:
+    image:  ollama/ollama:latest
+#   image:  ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
+#   command: >
+#     pull codellama:7b
+#     ollama pull codellama:7b
+    ports:
+      - "11434:11434"
+    container_name: ollama
+    environment:
+      - OLLAMA_MODELS=/root/.ollama/models
+#     - OLLAMA_MODELS=/usr/share/ollama/.ollama/models
+    volumes:
+#     - ./models
+      - ollama:/root/.ollama
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+#     - ${OPEN_WEBUI_PORT-3000}:8190
+    depends_on:
+      - ollama
+    volumes:
+      - open-webui:/app/backend/data
+
+volumes:
+  ollama: {}
+  open-webui: {}

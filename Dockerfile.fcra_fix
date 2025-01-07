@@ -1,0 +1,29 @@
+FROM rocker/shiny:4.3.1
+RUN apt-get -y update && apt-get install -y vim iputils-ping net-tools dnsutils
+
+RUN mkdir /srv/shiny-server/apps
+
+RUN R -e "install.packages(c('shiny','DT','duckdb','openxlsx','lubridate'))"
+#RUN R -e "install.packages(c( \
+# 'askpass','base64enc','bslib','cachem','cli','commonmark','cpp11','crayon','crosstalk','curl','DBI','digest','dplyr','DT','duckdb','evaluate','fansi','fastmap','fontawesome','fs', \
+# 'generics','glue','highr','htmltools','htmlwidgets','httpuv','httr2','jquerylib','jsonlite','knitr','later','lazyeval','lifecycle','lubridate','magrittr','mall','memoise','mime', \
+# 'ollamar','openssl','openxlsx','pillar','pkgconfig','promises','R6','rappdirs','Rcpp','rlang','rmarkdown','sass','shiny','shinyFiles','sourcetools','stringi','sys','tibble', \
+# 'tidyselect','timechange','tinytex','utf8','vctrs','withr','xfun','xtable','yaml','zip'))"
+
+#RUN R -e "install.packages('ollamar','https://cran.r-project.org')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/renv_1.0.11.tar.gz',repos=NULL,type='source')"
+RUN R -e "install.packages('https://cran.r-project.org/src/contrib/ollamar_1.2.1.tar.gz',repos=NULL,type='source')"
+#RUN R -e "install.packages('https://cran.r-project.org/src/contrib/mall_0.1.0.tar.gz',repos=NULL,type='source')"
+#RUN R -e "install.packages('https://cran.r-project.org/src/contrib/shiny_1.10.0.tar.gz',repos=NULL,type='source')"
+#RUN R -e "install.packages('tidyr',repos='https://cran.r-project.org')"
+#RUN R -e "install.packages('shiny',repos='https://cran.r-project.org')"
+
+#COPY ./fcra-shiny-new-main /srv/shiny-server/apps/fcra-shiny-new-main
+COPY ./fcra-shiny-new /srv/shiny-server/apps/fcra-shiny-new
+
+EXPOSE 8180 
+
+#CMD Rscript /srv/shiny-server/apps/fcra-shiny-new-main/app_regular.R
+#CMD Rscript /srv/shiny-server/apps/fcra-shiny-new-main/app_generative.R
+CMD R -e "renv::restore()"
+CMD Rscript /srv/shiny-server/apps/fcra-shiny-new/app_generative.R

@@ -46,6 +46,7 @@ ARG UID
 ARG GID
 
 ## Basis ##
+#   PORT=8080 \
 ENV ENV=prod \
     PORT=8080 \
     # pass build args to the build
@@ -56,8 +57,11 @@ ENV ENV=prod \
     USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
 
 ## Basis URL Config ##
-ENV OLLAMA_BASE_URL="/ollama" \
+ENV OLLAMA_BASE_URL="http://host.docker.internal:11434" \
     OPENAI_API_BASE_URL=""
+
+#ENV OLLAMA_BASE_URL="/ollama" \
+#    OPENAI_API_BASE_URL=""
 
 ## API Key and Security Config ##
 ENV OPENAI_API_KEY="" \
@@ -164,7 +168,9 @@ COPY --chown=$UID:$GID --from=build /app/package.json /app/package.json
 COPY --chown=$UID:$GID ./backend .
 
 EXPOSE 8080
+#EXPOSE 8190
 
+#HEALTHCHECK CMD curl --silent --fail http://localhost:${PORT:-8190}/health | jq -ne 'input.status == true' || exit 1
 HEALTHCHECK CMD curl --silent --fail http://localhost:${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1
 
 USER $UID:$GID
